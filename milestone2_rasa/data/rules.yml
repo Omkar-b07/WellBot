@@ -1,0 +1,67 @@
+version: "3.1"
+
+rules:
+  - rule: Send disclaimer on session start
+    conversation_start: true # This means it runs for a new user
+    steps:
+      - action: utter_disclaimer # Send the disclaimer first
+      - action: utter_greet
+
+  - rule: Say hello when user greets
+    steps:
+      - intent: greet
+      - action: utter_greet
+
+  - rule: Say goodbye anytime the user says goodbye
+    steps:
+      - intent: goodbye
+      - action: utter_goodbye
+
+  - rule: Handle inform intent
+    steps:
+      - intent: inform
+      - action: action_query_knowledge_base
+  # --- Handle asking for symptoms ---
+  - rule: Handle asking for symptom when condition is missing
+    steps:
+      - intent: ask_symptom
+      - slot_was_set:
+          - condition: null
+      - action: utter_ask_condition
+
+  - rule: Provide symptom information when condition is known
+    steps:
+      - intent: ask_symptom
+      - slot_was_set:
+          - condition: true
+      - action: action_query_knowledge_base
+
+  # --- Handle asking for first aid ---
+  - rule: Handle asking for first aid when condition is missing
+    steps:
+      - intent: ask_first_aid
+      - slot_was_set:
+          - condition: null
+      - action: utter_ask_condition
+
+  - rule: Provide first aid info when condition is known
+    steps:
+      - intent: ask_first_aid
+      - slot_was_set:
+          - condition: true
+      - action: action_query_knowledge_base
+
+  # --- Handle asking for wellness tips ---
+  - rule: Handle asking for wellness tip when condition is missing
+    steps:
+      - intent: ask_wellness_tip
+      - slot_was_set:
+          - condition: null
+      - action: utter_ask_condition
+
+  - rule: Provide wellness tip info when condition is known
+    steps:
+      - intent: ask_wellness_tip
+      - slot_was_set:
+          - condition: true
+      - action: action_query_knowledge_base

@@ -1,0 +1,41 @@
+--- Python Virtual Environments ---
+
+Ignores your venv folder
+
+.venv/
+venv/
+*.venv/
+.env/
+
+--- Python Cache ---
+
+pycache/
+*.py[cod]
+*.pyc
+
+--- Rasa Specific ---
+
+Ignores large, trained models
+
+models/*.tar.gz
+
+Ignores Rasa's internal cache and DBs
+
+.rasa/
+
+--- Database Files ---
+
+We want to track the knowledge base CSV,
+
+but NOT the generated database file.
+
+*.db
+*.sqlite
+*.sqlite3
+
+--- OS & IDE Files ---
+
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

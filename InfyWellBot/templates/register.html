@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Wellness Bot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Register for Wellness Bot</h1>
+        <form id="registerForm">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <!-- NEW FIELDS -->
+            <label for="age_group">Age Group:</label>
+            <select id="age_group" name="age_group" required>
+                <option value="">-- Select Age Group --</option>
+                <option value="18-24">18-24</option>
+                <option value="25-34">25-34</option>
+                <option value="35-44">35-44</option>
+                <option value="45-54">45-54</option>
+                <option value="55+">55+</option>
+                <option value="under_18">Under 18</option>
+            </select>
+
+            <label for="preferred_language">Preferred Language:</label>
+            <select id="preferred_language" name="preferred_language" required>
+                <option value="en">English</option>
+                <option value="hi">Hindi</option>
+            </select>
+            <!-- END NEW FIELDS -->
+
+            <button type="submit">Register</button>
+        </form>
+        <p id="successMessage" class="success"></p>
+        <p id="errorMessage" class="error"></p>
+        <p>Already have an account? <a href="{{ url_for('login_page') }}">Login here</a></p>
+    </div>
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>
+</html>

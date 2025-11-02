@@ -1,0 +1,112 @@
+version: "3.1"
+nlu:
+- intent: greet
+  examples: |
+    - नमस्ते
+    - नमस्कार
+    - हे
+    - हाय
+    - सुप्रभात
+
+- intent: goodbye
+  examples: |
+    - अलविदा
+    - बाय
+    - फिर मिलेंगे
+    - धन्यवाद, बस इतना ही
+
+- intent: ask_symptom
+  examples: |
+    - [सर्दी](condition) के लक्षण क्या हैं?
+    - [तीन दिनों से](duration) [सर्दी](condition) के लक्षण क्या हैं?
+    - [बुरा](severity) [सिरदर्द](condition) के लक्षण
+    - [माइग्रेन](condition) के लक्षण
+    - [कोविड-19](condition) के लक्षणों के बारे में बताएं
+    - [चिकनपॉक्स](condition) के लक्षण क्या हैं?
+    - मेरे [पेट पर](location) [चिकनपॉक्स](condition) के क्या लक्षण हैं?
+    - [आंख आना](condition) (pink eye) के बारे में बताएं
+
+- intent: ask_first_aid
+  examples: |
+    - [मामूली जलने](condition) (minor burn) पर क्या करें?
+    - [खरोंच](condition) (scrape) का इलाज कैसे करें?
+    - [मोच](condition) (sprain) के लिए प्राथमिक उपचार
+    - [नकसीर](condition) (nosebleed) फूटने पर क्या करें?
+    - [कीड़े के काटने](condition) (insect bite) पर प्राथमिक उपचार
+    - [सिरदर्द](condition) (headache) का इलाज
+    - [मधुमक्खी के डंक](condition) (bee sting) पर क्या करें?
+
+- intent: ask_wellness_tip
+  examples: |
+    - [नींद](condition) (sleep) के लिए एक टिप दें
+    - [तनाव](condition) (stress) का प्रबंधन कैसे करें?
+    - अच्छे [आहार](condition) (diet) के बारे में बताएं
+    - [हाइड्रेशन](condition) (hydration) टिप्स
+
+- intent: inform
+  examples: |
+    - मुझे [सर्दी](condition) है [दो दिनों से](duration)
+    - मुझे [बहुत](severity) [तनाव](condition) (stress) महसूस हो रहा है
+    - मुझे [हल्का](severity) [सिरदर्द](condition) (headache) है
+    - मैं [बुखार](condition) (fever) से पीड़ित हूँ
+    - मेरे [सिर में](location) [दर्द](condition) है
+    - [सर्दी](condition)
+    - [फ्लू](condition)
+    - [तनाव](condition)
+    - [बुखार](condition)
+    - मेरे [हाथ पर](location) [रैश](condition) है
+
+- intent: general_query
+  examples: |
+    - मैं क्या कर सकता हूँ
+    - और बताओ
+    - मुझे क्या करना चाहिए?
+    - कोई सलाह?
+
+- intent: ask_prevention
+  examples: |
+    - [फ्लू](condition) (flu) से कैसे बचें?
+    - [सर्दी](condition) (cold) से बचाव के उपाय
+    - [डायरिया](condition) (diarrhea) की रोकथाम
+    - [मधुमेह](condition) (diabetes) को कैसे रोकें?
+    - [पीठ दर्द](condition) (back pain) से कैसे बचें?
+
+- lookup: condition
+  examples: |
+    - सर्दी
+    - फ्लू
+    - कोविड-19
+    - एलर्जी
+    - सिरदर्द
+    - माइग्रेन
+    - मोच
+    - मामूली जलने
+    - खरोंच
+    - कटने
+    - कीड़े के काटने
+    - नकसीर
+    - नींद
+    - हाइड्रेशन
+    - व्यायाम
+    - तनाव
+    - आहार
+    - हाथ धोना
+    - आसन
+    - बुखार
+    - दस्त
+    - चिंता
+    - चिकनपॉक्स
+    - आंख आना
+    - फूड पॉइजनिंग
+    - डिहाइड्रेशन
+    - अनिद्रा
+    - पेट दर्द
+    - कब्ज
+    - मधुमेह
+    - उच्च रक्तचाप
+    - दम घुटना
+    - मधुमक्खी का डंक
+    - दिल की बीमारी
+    - पीठ दर्द
+    - रैश
+

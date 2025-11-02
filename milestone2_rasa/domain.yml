@@ -1,0 +1,105 @@
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - ask_symptom
+  - ask_first_aid
+  - ask_wellness_tip
+  - inform
+  - general_query  
+  - ask_prevention
+
+entities:
+  - condition
+  - duration
+  - severity
+  - location
+slots:
+  condition:
+    type: text
+    influence_conversation: true
+    mappings:
+    - type: from_entity
+      entity: condition
+  duration:
+    type: text
+    influence_conversation: false
+    mappings:
+    - type: from_entity
+      entity: duration
+  severity:
+    type: text
+    influence_conversation: false
+    mappings:
+    - type: from_entity
+      entity: severity
+  location:
+    type: text
+    influence_conversation: false
+    mappings:
+    - type: from_entity
+      entity: location
+actions:
+  - action_query_knowledge_base
+
+responses:
+  utter_greet:
+  - text: "Hello! I'm your wellness assistant. You can ask me about symptoms, first-aid, or general wellness tips."
+  utter_disclaimer:
+  - text: "Please remember, I am an AI assistant and not a medical professional. My advice is for informational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment."
+  utter_goodbye:
+  - text: "Goodbye! Stay safe and healthy."
+  utter_ask_condition:
+  - text: "I can help with that. What condition are you asking about?"
+  utter_not_found:
+  - text: "I'm sorry, I don't have information on that specific topic. Try asking in a different way."
+  utter_iamabot:
+  - text: "I am a bot, powered by Rasa."
+
+rules:
+- rule: Send disclaimer on session start
+  conversation_start: true
+  steps:
+  - action: utter_disclaimer
+  - action: utter_greet
+
+- rule: Say hello when user greets
+  conversation_start: false
+  steps:
+  - intent: greet
+  - action: utter_greet
+
+- rule: Say goodbye anytime the user says goodbye
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye
+
+- rule: Handle asking for symptom without entity
+  steps:
+  - intent: ask_symptom
+  - slot_was_set:
+    - condition: false
+  - action: utter_ask_condition
+
+- rule: Handle asking for first aid without entity
+  steps:
+  - intent: ask_first_aid
+  - slot_was_set:
+    - condition: false
+  - action: utter_ask_condition
+
+- rule: Handle asking for wellness tip without entity
+  steps:
+  - intent: ask_wellness_tip
+  - slot_was_set:
+    - condition: false
+  - action: utter_ask_condition
+
+- rule: Handle asking for prevention without entity
+  steps:
+  - intent: ask_prevention
+  - slot_was_set:
+    - condition: false
+  - action: utter_ask_condition
+

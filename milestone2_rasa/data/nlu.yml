@@ -1,0 +1,190 @@
+version: "3.1"
+
+nlu:
+- intent: greet
+  examples: |
+    - hey
+    - hello
+    - hi
+    - hi there
+    - good morning
+
+- intent: goodbye
+  examples: |
+    - bye
+    - goodbye
+    - see you later
+    - thanks, that's all
+
+- intent: ask_symptom
+  examples: |
+    - what are the symptoms of a [bad](severity) [cold](condition)?
+    - symptoms for [headache](condition) [for 3 days](duration)
+    - [migraine](condition) symptoms
+    - tell me about [covid-19](condition) symptoms
+    - signs of a [mild](severity) [cold](condition)
+    - what symptoms does [flu](condition) have
+    - list the symptoms for [allergy](condition)
+    - I think I have the [flu](condition), what are the signs?
+    - how do I know if I have an [allergy](condition)?
+    - what does a [terrible](severity) [migraine](condition) feel like?
+    - what happens when you have a [cold](condition)?
+    - what are the symptoms?
+    - tell me about [pink eye](condition)
+    - what are the signs of [chickenpox](condition) on my [stomach](location)?
+    - symptoms of [food poisoning](condition)
+    - what are symptoms of [dehydration](condition)?
+    - what are [stomach ache](condition) symptoms?
+    - signs of [strep throat](condition)
+    - what is a [uti](condition)?
+    - what does [eczema](condition) look like?
+    - what are symptoms of [depression](condition)?
+    - signs of [diabetes](condition)
+
+- intent: ask_first_aid
+  examples: |
+    - what to do for a [minor](severity) [burn](condition)?
+    - how do I treat a [scrape](condition) on my [knee](location)?
+    - first aid for a [bad](severity) [sprain](condition)
+    - first aid for a [deep](severity) [cut](condition) [on my hand](location)
+    - what to do for a [nosebleed](condition) that won't stop?
+    - [insect bite](condition) first aid
+    - treatment for a [splitting](severity) [headache](condition)
+    - what should i do for mild [headache](condition)
+    - I got a [minor burn](condition) [on my arm](location), what now?
+    - what to do for [food poisoning](condition) [since yesterday](duration)?
+    - how to treat [dehydration](condition)
+    - what to do for [choking](condition)?
+    - i got a [bee sting](condition)
+    - i have an [object in my eye](location)
+
+- intent: ask_wellness_tip
+  examples: |
+    - give me a tip for [sleep](condition)
+    - how to manage [stress](condition) [at work](location)
+    - tell me about a good [diet](condition)
+    - [hydration](condition) tips
+    - tips for good [posture](condition)
+
+- intent: inform
+  examples: |
+    - i am having a [severe](severity) [cold](condition) [for three days](duration)
+    - i have a [cold](condition)
+    - my issue is [stress](condition)
+    - i feel [stress](condition)
+    - i have a [headache](condition)
+    - i got a [minor burn](condition)
+    - i have a [rash](condition) on my [left arm](location)
+    - i have a mild [headache](condition) [since this morning](duration)
+    - i feel like i have the [flu](condition)
+    - [cold](condition)
+    - [flu](condition)
+    - [stress](condition)
+    - it's about [migraine](condition)
+    - i have a runny nose [for 2 days](duration)
+    - my [head](location) hurts
+    - i have a [fever](condition)
+    - i'm running a [fever](condition) [since last night](duration)
+    - i have [pink eye](condition) in [both eyes](location)
+    - i have [anxiety](condition)
+
+- intent: general_query
+  examples: |
+    - okk what can i do
+    - tell me more
+    - what should I do?
+    - any advice?
+    - tell me about prevention
+    - what precautions should I take?
+
+- intent: ask_prevention
+  examples: |
+    - how can i prevent getting [flu](condition)
+    - prevention tips for [flu](condition)
+    - tips to avoid the [flu](condition)
+    - how to prevent [cold](condition)
+    - what are precautions for [cold](condition)
+    - how to prevent [diabetes](condition)
+    - [heart disease](condition) prevention
+    - prevent [uti](condition)
+    - [sun safety](condition) tips
+    - how to prevent [back pain](condition)
+
+- lookup: condition
+  examples: |
+    - cold
+    - flu
+    - covid-19
+    - allergy
+    - headache
+    - migraine
+    - sprain
+    - minor burn
+    - scrape
+    - cut
+    - insect bite
+    - nosebleed
+    - sleep
+    - hydration
+    - exercise
+    - stress
+    - diet
+    - hand washing
+    - posture
+    - fever
+    - diarrhea
+    - anxiety
+    - chickenpox
+    - pink eye
+    - food poisoning
+    - dehydration
+    - insomnia
+    - stomach ache
+    - gastritis
+    - constipation
+    - seasonal allergies
+    - strep throat
+    - uti
+    - eczema
+    - psoriasis
+    - acne
+    - bronchitis
+    - pneumonia
+    - sinusitis
+    - depression
+    - diabetes
+    - hypertension
+    - heat exhaustion
+    - heatstroke
+    - hypothermia
+    - fracture
+    - seizure
+    - anaphylaxis
+    - poison ivy
+    - object in eye
+    - choking
+    - bee sting
+    - meditation
+    - mindfulness
+    - social connection
+    - work-life balance
+    - healthy fats
+    - fiber
+    - protein
+    - carbohydrates
+    - vitamins
+    - alcohol
+    - smoking
+    - yoga
+    - cardio exercise
+    - strength training
+    - hygiene
+    - nutrition
+    - mental health
+    - screen time
+    - heart disease
+    - sun safety
+    - back pain
+    - default
+    - rash
+
