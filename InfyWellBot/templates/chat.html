@@ -59,7 +59,7 @@
                     </div>
                     <div class="account-links">
                         <a href="{{ url_for('profile_page') }}">Edit Profile</a>
-                        <button id="logoutButton" class="logout-button">Logout</button>
+                        <!-- Logout is now in sidebar, but keeping structure if needed -->
                     </div>
                 </div>
             </header>
@@ -94,4 +94,3 @@
     <script src="{{ url_for('static', filename='js/auth.js') }}"></script> <!-- Contains the logoutButton logic -->
 </body>
 </html>
-

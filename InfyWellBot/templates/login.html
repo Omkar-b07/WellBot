@@ -11,13 +11,13 @@
     
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body class="auth-page"> <!-- Add class to body -->
+<body class="auth-page"> 
     
     <div class="auth-page-wrapper">
         <!-- 1. Branding Column -->
         <div class="auth-brand-column">
             <div class="brand-content">
-                <!-- You can add an SVG logo here later -->
+                <!-- SVG logo -->
                 <h2>Wellness Guide Bot</h2>
                 <p>Your AI-powered health assistant. Here to help.</p>
             </div>
@@ -39,6 +39,12 @@
                 </form>
                 <p id="errorMessage" class="error"></p>
                 <p class="auth-switch">Don't have an account? <a href="{{ url_for('register_page') }}">Sign Up</a></p>
+                
+                <!-- ADMIN LINK -->
+                <p class="admin-link">
+                    <a href="{{ url_for('admin_login') }}">Admin Login</a>
+                </p>
+                <!-- END ADMIN LINK -->
             </div>
         </div>
     </div>

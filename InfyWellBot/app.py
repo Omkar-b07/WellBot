@@ -1,28 +1,28 @@
 import os
 import requests
-
-from flask import Flask, request, jsonify, render_template, redirect, url_for
-
+from flask import Flask, request, jsonify, render_template, redirect, url_for, session, flash, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import (
     create_access_token, get_jwt_identity, jwt_required,
     JWTManager, set_access_cookies, unset_jwt_cookies
 )
 from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
+from datetime import datetime
+from sqlalchemy import func # <-- IMPT: Needed for charts
 
-
+# --- App Initialization ---
 app = Flask(__name__)
 
-
+# --- Database Configuration ---
 db_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'project.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config["SECRET_KEY"] = "your-admin-session-secret-key"
 
-
-app.config["JWT_SECRET_KEY"] = "your-super-secret-key-please-change-me" 
-
+# --- JWT Configuration ---
+app.config["JWT_SECRET_KEY"] = "your-super-secret-key-please-change-me"
 app.config["JWT_TOKEN_LOCATION"] = ["headers", "cookies"]
-
 app.config["JWT_COOKIE_CSRF_PROTECT"] = False
 jwt = JWTManager(app)
 
@@ -34,89 +34,98 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
-    preferred_language = db.Column(db.String(10), default='en', nullable=False) # Make non-nullable
+    preferred_language = db.Column(db.String(10), default='en', nullable=False)
     age_group = db.Column(db.String(20), nullable=True)
+    is_admin = db.Column(db.Boolean, default=False, nullable=False)
 
     def __repr__(self):
         return f'<User {self.email}>'
 
+class HealthKnowledge(db.Model):
+    __tablename__ = 'health_knowledge'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    intent = db.Column(db.String(100), nullable=False)
+    entity = db.Column(db.String(100), nullable=False)
+    response_en = db.Column(db.Text, nullable=False)
+    response_hi = db.Column(db.Text, nullable=False)
+
+class UserWellnessData(db.Model):
+    __tablename__ = 'user_wellness_data'
+    UserID = db.Column(db.String, primary_key=True)
+    Date = db.Column(db.String, primary_key=True)
+    Steps = db.Column(db.String)
+    CaloriesBurned = db.Column(db.String)
+    DistanceKm = db.Column(db.String)
+    SleepHours = db.Column(db.String)
+    HeartRate = db.Column(db.String)
+    FoodItem = db.Column(db.String)
+    CaloriesIntake = db.Column(db.String)
+    Protein_g = db.Column(db.String)
+    Fat_g = db.Column(db.String)
+    Carbs_g = db.Column(db.String)
+    WaterIntake_L = db.Column(db.String)
+    Mood = db.Column(db.String)
+    Recommendation = db.Column(db.Text)
+
+class ChatFeedback(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.String(36), nullable=False)
+    user_message = db.Column(db.Text, nullable=False)
+    bot_response = db.Column(db.Text, nullable=False)
+    rating = db.Column(db.String(10), nullable=False)
+    comment = db.Column(db.Text, nullable=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+# --- Admin Decorator ---
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('admin_logged_in'):
+            return redirect(url_for('admin_login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+# --- HTML Serving Routes ---
 @app.route('/')
 def index():
-    """Redirects base URL to the login page if not logged in, else chat."""
-
-    from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
-    try:
-        
-        verify_jwt_in_request(optional=True, locations=["cookies"])
-        if get_jwt_identity():
-            return redirect(url_for('chat_page')) 
-    except Exception as e:
-        print(f"Error checking JWT at index: {e}") 
-        pass
     return redirect(url_for('login_page'))
 
 @app.route('/login_page')
 def login_page():
-    """Serves the login HTML page."""
     return render_template('login.html')
 
 @app.route('/register_page')
 def register_page():
-    """Serves the register HTML page."""
     return render_template('register.html')
 
-# Protect the chat page route - only accessible if logged in via cookie
 @app.route('/chat_page')
-@jwt_required(locations=["cookies"]) # Check if user has a valid login cookie
+@jwt_required(locations=["cookies"])
 def chat_page():
-    """Serves the main chat HTML page."""
     return render_template('chat.html')
 
 @app.route('/profile_page')
-@jwt_required(locations=["cookies"]) # Protect this page
+@jwt_required(locations=["cookies"])
 def profile_page():
-    """Serves the profile editing HTML page."""
     return render_template('profile.html')
 
-
-
-# Handles missing/invalid token for @jwt_required routes
+# --- JWT Error Handlers ---
 @jwt.unauthorized_loader
-def unauthorized_render_callback(error_string):
-    print(f"Unauthorized access detected: {error_string}")
-
-    rule = request.url_rule
-    if rule and not rule.endpoint.endswith(('_page', 'index')): # Crude check if it's an API route
-        print("-> Responding with JSON error")
-        return jsonify(msg="Missing or invalid token"), 401
-    else:
-        print("-> Redirecting to login page")
+def unauthorized_callback(error_string):
+    if request.accept_mimetypes.accept_html:
         return redirect(url_for('login_page'))
+    return jsonify(msg="Missing or invalid token"), 401
 
-# Handles expired tokens specifically
 @jwt.expired_token_loader
 def expired_token_render_callback(jwt_header, jwt_payload):
-    print("Expired token detected")
-    # Similar check for HTML vs JSON response
-    rule = request.url_rule
-    if rule and not rule.endpoint.endswith(('_page', 'index')):
-        print("-> Responding with JSON error")
-        return jsonify(msg="Token has expired"), 401
-    else:
-        print("-> Redirecting to login page")
-        # Maybe add a flash message here later
+    if request.accept_mimetypes.accept_html:
         return redirect(url_for('login_page'))
+    return jsonify(msg="Token has expired"), 401
 
-
-# --- API Endpoints (These handle JSON requests from JavaScript/PowerShell) ---
-
+# --- API Endpoints ---
 @app.route('/register', methods=['POST'])
 def register():
-    """Registers a new user including age and language (API endpoint)."""
     data = request.get_json()
-    if not data:
-        return jsonify({"msg": "Missing JSON in request"}), 400
-
     email = data.get('email')
     password = data.get('password')
     age_group = data.get('age_group')
@@ -124,210 +133,291 @@ def register():
 
     if not email or not password:
         return jsonify({"msg": "Email and password are required"}), 400
-    if preferred_language not in ['en', 'hi']:
-        return jsonify({"msg": "Invalid preferred language"}), 400
-    # Add age group validation if needed
-
     if User.query.filter_by(email=email).first():
         return jsonify({"msg": "Email already exists"}), 400
 
     hashed_password = generate_password_hash(password)
+    is_first_user = User.query.count() == 0
     new_user = User(
         email=email,
         password_hash=hashed_password,
         age_group=age_group,
-        preferred_language=preferred_language
+        preferred_language=preferred_language,
+        is_admin=is_first_user
     )
-    try:
-        db.session.add(new_user)
-        db.session.commit()
-        print(f"User registered: {email}, Lang: {preferred_language}, Age: {age_group}")
-        return jsonify({"msg": "User created successfully"}), 201
-    except Exception as e:
-        db.session.rollback()
-        print(f"!!! DB Error during registration: {e}")
-        return jsonify({"msg": "Database error during registration"}), 500
-
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify({"msg": "User created successfully"}), 201
 
 @app.route('/login', methods=['POST'])
 def login():
-    """Logs in a user via API, returns JWT token, AND sets an HTTP-only cookie."""
     data = request.get_json()
-    if not data:
-        return jsonify({"msg": "Missing JSON in request"}), 400
     email = data.get('email')
     password = data.get('password')
-
-    if not email or not password:
-        return jsonify({"msg": "Email and password required"}), 400
-
     user = User.query.filter_by(email=email).first()
 
     if user and check_password_hash(user.password_hash, password):
         access_token = create_access_token(identity=str(user.id))
-        response = jsonify(access_token=access_token) # Also return token for potential API clients
-        # Set the JWT in an HTTP-only cookie for secure browser sessions
+        response = jsonify(access_token=access_token)
         set_access_cookies(response, access_token)
-        print(f"Login successful for {email}, cookie set.") # Debug print
         return response
-
-    print(f"Login failed for {email}.") # Debug print
     return jsonify({"msg": "Bad email or password"}), 401
 
 @app.route('/logout', methods=['POST'])
 def logout():
-    """Logs out user by clearing the JWT cookie (API endpoint)."""
     response = jsonify({"msg": "Logout successful"})
     unset_jwt_cookies(response)
-    print("User logged out, cookie unset.") # Debug print
     return response
 
-
 @app.route('/profile', methods=['GET', 'PUT'])
-@jwt_required() # Checks header OR cookie automatically based on config
+@jwt_required()
 def profile():
-    """Gets or updates the logged-in user's profile (API endpoint)."""
-    current_user_id = get_jwt_identity() # Works with header or cookie (returns string ID)
-    # Use db.session.get for primary key lookup, converting ID to int if necessary
+    current_user_id = get_jwt_identity()
     user = db.session.get(User, int(current_user_id))
     if not user:
         return jsonify({"msg": "User not found"}), 404
 
     if request.method == 'GET':
-        print(f"GET /profile for User ID: {current_user_id}")
-        return jsonify(
-            email=user.email,
-            preferred_language=user.preferred_language,
-            age_group=user.age_group
-        )
+        return jsonify(email=user.email, preferred_language=user.preferred_language, age_group=user.age_group)
 
     if request.method == 'PUT':
         data = request.get_json()
-        if not data:
-            return jsonify({"msg": "Missing JSON in request"}), 400
-        print(f"PUT /profile for User ID: {current_user_id} with data: {data}")
-
-        updated = False
         if 'preferred_language' in data:
-             lang = data['preferred_language']
-             if lang in ['en', 'hi']:
-                 user.preferred_language = lang
-                 updated = True
-             else:
-                  return jsonify({"msg": "Invalid language code"}), 400
+             user.preferred_language = data['preferred_language']
         if 'age_group' in data:
-             # Add validation for age_group if needed
-             user.age_group = data.get('age_group') # Allow setting age_group to null/empty
-             updated = True
-
-        if updated:
-            try:
-                db.session.commit()
-                print("Profile update successful.")
-                return jsonify({"msg": "Profile updated successfully"})
-            except Exception as e:
-                db.session.rollback()
-                print(f"!!! DB Error updating profile: {e}")
-                return jsonify({"msg": "Database error during profile update"}), 500
-        else:
-             return jsonify({"msg": "No profile fields provided for update"}), 400
-
+             user.age_group = data.get('age_group')
+        db.session.commit()
+        return jsonify({"msg": "Profile updated successfully"})
 
 @app.route('/chat', methods=['POST'])
-@jwt_required() # Checks header OR cookie
+@jwt_required()
 def chat():
-    """Handles chat messages (API endpoint), gets user lang, forwards to Rasa."""
-    print("\n--- FLASK /chat Endpoint Hit ---")
-    current_user_id = get_jwt_identity() # String user ID
+    current_user_id = get_jwt_identity()
     user = db.session.get(User, int(current_user_id))
     if not user:
-         print(f"!!! ERROR: User ID {current_user_id} not found in DB for chat.")
-         return jsonify({"error": "User authentication error"}), 404 # Use 404 or 401
+         return jsonify({"error": "User authentication error"}), 404
 
-    user_language = user.preferred_language # Get 'en' or 'hi'
-    print(f"User ID: {current_user_id}, Language: {user_language}")
+    user_language = user.preferred_language
+    data = request.get_json()
+    message = data.get('message')
+    if not message:
+        return jsonify({"error": "No message provided"}), 400
+
+    RASA_API_URL = "http://127.0.0.1:5005/webhooks/rest/webhook"
+    payload = {
+        "sender": current_user_id,
+        "message": message,
+        "metadata": {"user_language": user_language}
+    }
+    
+    try:
+        rasa_response = requests.post(RASA_API_URL, json=payload, timeout=10)
+        rasa_response.raise_for_status()
+        bot_messages = rasa_response.json()
+        
+        bot_reply = "Rasa returned an empty response."
+        if bot_messages and isinstance(bot_messages, list) and len(bot_messages) > 0:
+            bot_reply = bot_messages[0].get("text", "Error parsing Rasa reply.")
+        
+        return jsonify({"reply": bot_reply, "user_message": message})
+
+    except requests.exceptions.ConnectionError:
+        return jsonify({"error": "Could not connect to the chatbot server"}), 503
+    except Exception as e:
+        print(f"!!! General Exception in /chat: {e}")
+        return jsonify({"error": "An internal error occurred"}), 500
+
+@app.route('/feedback', methods=['POST'])
+@jwt_required()
+def feedback():
+    current_user_id = get_jwt_identity()
+    data = request.get_json()
+    user_message = data.get('user_message')
+    bot_response = data.get('bot_response')
+    rating = data.get('rating')
+    comment = data.get('comment', '')
+
+    if not all([user_message, bot_response, rating]):
+        return jsonify({"msg": "Missing data"}), 400
+    
+    try:
+        new_feedback = ChatFeedback(
+            user_id=current_user_id,
+            user_message=user_message,
+            bot_response=bot_response,
+            rating=rating,
+            comment=comment
+        )
+        db.session.add(new_feedback)
+        db.session.commit()
+        return jsonify({"msg": "Feedback saved"}), 201
+    except Exception as e:
+        db.session.rollback()
+        print(f"!!! Error saving feedback: {e}")
+        return jsonify({"msg": "Error saving feedback"}), 500
+
+# --- ADMIN DASHBOARD ROUTES ---
+
+@app.route('/admin', methods=['GET'])
+def admin_index_redirect():
+    return redirect(url_for('admin_login'))
+
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        user = User.query.filter_by(email=email).first()
+
+        if user and check_password_hash(user.password_hash, password) and user.is_admin:
+            session['admin_logged_in'] = True
+            session['admin_email'] = user.email
+            return redirect(url_for('admin_dashboard'))
+        else:
+            flash('Invalid credentials or not an admin.', 'error')
+            return redirect(url_for('admin_login'))
+
+    return render_template('admin_login.html')
+
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin_logged_in', None)
+    session.pop('admin_email', None)
+    flash('You have been logged out.', 'success')
+    return redirect(url_for('admin_login'))
+
+@app.route('/admin/dashboard')
+@admin_required
+def admin_dashboard():
+    """Shows the main admin dashboard with analytics."""
+
+    # --- 1. Calculate Statistics ---
+    total_users = User.query.count()
+    total_tips = HealthKnowledge.query.count()
+    total_feedback = ChatFeedback.query.count()
+
+    positive_feedback = ChatFeedback.query.filter_by(rating='good').count()
+    if total_feedback > 0:
+        satisfaction_rate = round((positive_feedback / total_feedback) * 100)
+    else:
+        satisfaction_rate = 0
+
+    # --- 2. Prepare Feedback Chart Data ---
+    negative_feedback = total_feedback - positive_feedback
+    chart_feedback_data = {
+        'labels': ['Positive', 'Negative'],
+        'data': [positive_feedback, negative_feedback]
+    }
+
+    # --- 3. Intent Count Chart ---
+    intent_counts = db.session.query(
+        HealthKnowledge.intent,
+        func.count(HealthKnowledge.intent)
+    ).group_by(HealthKnowledge.intent).all()
+
+    chart_intent_labels = [item[0].replace('_', ' ').title() for item in intent_counts]
+    chart_intent_data = [item[1] for item in intent_counts]
+
+    # --- 4. Activity Chart (Queries Per Day) ---
+    daily_counts = db.session.query(
+        func.strftime("%Y-%m-%d", ChatFeedback.timestamp),
+        func.count(ChatFeedback.id)
+    ).group_by(func.strftime("%Y-%m-%d", ChatFeedback.timestamp)).all()
+
+    if daily_counts:
+        chart_activity_labels = [row[0] for row in daily_counts]
+        chart_activity_data = [row[1] for row in daily_counts]
+    else:
+        # Fallback if no data exists
+        chart_activity_labels = ["No Data"]
+        chart_activity_data = [0]
+
+    # --- 5. Fetch Tables ---
+    try:
+        knowledge_base = HealthKnowledge.query.order_by(
+            HealthKnowledge.intent,
+            HealthKnowledge.entity
+        ).all()
+    except Exception:
+        knowledge_base = []
 
     try:
-        data = request.get_json()
-        if not data:
-             print("!!! ERROR: No JSON data in chat request.")
-             return jsonify({"error": "Missing JSON data"}), 400
+        feedback_logs = ChatFeedback.query.order_by(
+            ChatFeedback.timestamp.desc()
+        ).limit(50).all()
+    except Exception:
+        feedback_logs = []
 
-        message = data.get('message')
-        print(f"Received message: {message}")
-        if not message:
-            print("!!! ERROR: No message provided.")
-            return jsonify({"error": "No message provided"}), 400
+    try:
+        user_logs = UserWellnessData.query.limit(50).all()
+    except Exception:
+        user_logs = []
 
-        # Use 127.0.0.1 for potentially better reliability than localhost
-        RASA_API_URL = "http://127.0.0.1:5005/webhooks/rest/webhook"
-        payload = {
-            "sender": current_user_id, # Use user ID as sender ID for Rasa
-            "message": message,
-            "metadata": {"user_language": user_language} # Pass language to action server
-        }
-        print(f"Payload to send to Rasa: {payload}")
+    # --- 6. Render Template ---
+    return render_template(
+        'admin_dashboard.html',
+        total_users=total_users,
+        total_tips=total_tips,
+        total_feedback=total_feedback,
+        satisfaction_rate=satisfaction_rate,
+        chart_feedback_data=chart_feedback_data,
+        chart_intent_labels=chart_intent_labels,
+        chart_intent_data=chart_intent_data,
+        chart_activity_labels=chart_activity_labels,
+        chart_activity_data=chart_activity_data,
+        knowledge=knowledge_base,
+        user_logs=user_logs,
+        feedback_logs=feedback_logs
+    )
+    
 
-        print(f"Attempting to send request to Rasa at {RASA_API_URL}...")
-        try:
-            # Send request to Rasa
-            rasa_response = requests.post(RASA_API_URL, json=payload, timeout=10)
-            rasa_response.raise_for_status() # Raise HTTPError for bad responses (4xx or 5xx)
-            print("Successfully received response from Rasa.")
+@app.route('/admin/add_tip', methods=['POST'])
+@admin_required
+def admin_add_tip():
+    try:
+        intent = request.form['intent']
+        entity = request.form['entity']
+        response_en = request.form['response_en']
+        response_hi = request.form['response_hi']
 
-            bot_messages = rasa_response.json()
-            print(f"Rasa raw response: {bot_messages}")
+        if not all([intent, entity, response_en, response_hi]):
+            flash("All fields are required.", "error")
+            return redirect(url_for('admin_dashboard'))
 
-            if bot_messages and isinstance(bot_messages, list) and len(bot_messages) > 0:
-                # Extract text from the first message object
-                bot_reply = bot_messages[0].get("text", "Sorry, I received an unexpected format from the bot.")
-            else:
-                bot_reply = "Sorry, the bot didn't provide a response."
-                print("Warning: Rasa returned an empty or invalid response.")
-
-            print(f"Extracted bot reply: {bot_reply}")
-            print("--- FLASK /chat Endpoint Success ---")
-            return jsonify({"reply": bot_reply})
-
-        # --- Specific Error Handling for Rasa Connection ---
-        except requests.exceptions.ConnectionError:
-            print("!!! ConnectionError: Could not connect to Rasa server. Is it running?")
-            return jsonify({"error": "Could not connect to the chatbot server"}), 503 # Service Unavailable
-        except requests.exceptions.Timeout:
-            print("!!! TimeoutError: Connection to Rasa server timed out.")
-            return jsonify({"error": "Chatbot server connection timed out"}), 504 # Gateway Timeout
-        except requests.exceptions.RequestException as e:
-            # Includes HTTPError raised by raise_for_status()
-            print(f"!!! RequestException: Error during request to Rasa: {e}")
-            error_msg = f"Error communicating with Rasa: {e}"
-            status_code = 500 # Internal Server Error
-            if e.response is not None:
-                status_code = e.response.status_code
-                try:
-                    rasa_error = e.response.json()
-                    print(f"Rasa returned error status {status_code}: {rasa_error}")
-                    error_msg = f"Rasa error ({status_code}): {rasa_error.get('message', str(rasa_error))}"
-                except ValueError: # If Rasa error response wasn't JSON
-                    error_msg = f"Rasa returned non-JSON error ({status_code}): {e.response.text}"
-            return jsonify({"error": error_msg}), status_code if status_code >= 500 else 500 # Return 5xx
-
-    # --- General Error Handling ---
+        new_tip = HealthKnowledge(
+            intent=intent,
+            entity=entity.lower(),
+            response_en=response_en,
+            response_hi=response_hi
+        )
+        db.session.add(new_tip)
+        db.session.commit()
+        flash("Health tip added successfully!", "success")
     except Exception as e:
-        print(f"!!! General Exception in /chat: {type(e).__name__} - {e}")
-        # Log the full traceback for debugging if needed
-        import traceback
-        traceback.print_exc()
-        return jsonify({"error": "An internal server error occurred"}), 500
+        db.session.rollback()
+        print(f"Error adding tip: {e}")
+        flash("Error adding tip to database.", "error")
+    
+    return redirect(url_for('admin_dashboard'))
 
+@app.route('/admin/delete_tip/<int:id>', methods=['POST'])
+@admin_required
+def admin_delete_tip(id):
+    try:
+        tip = db.session.get(HealthKnowledge, id)
+        if tip:
+            db.session.delete(tip)
+            db.session.commit()
+            flash("Health tip deleted successfully.", "success")
+        else:
+            flash("Tip not found.", "error")
+    except Exception as e:
+        db.session.rollback()
+        flash("Error deleting tip.", "error")
+        
+    return redirect(url_for('admin_dashboard'))
 
-# --- Run the App ---
 if __name__ == '__main__':
-    print(f"Database path: {db_path}") # Print DB path on startup
     with app.app_context():
-        # Create tables if they don't exist based on the models defined
         db.create_all()
-        print("Database tables checked/created.")
-    print(f"Starting Flask server on http://0.0.0.0:5000...")
-    # Listen on all available network interfaces
     app.run(debug=True, port=5000, host='0.0.0.0')
-

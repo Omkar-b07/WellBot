@@ -4,16 +4,111 @@ document.addEventListener('DOMContentLoaded', () => {
     const userInput = document.getElementById('userInput');
     const errorMessage = document.getElementById('errorMessage');
 
-    // Function to add a message to the chatbox
-    function addMessage(sender, text) {
-        const messageDiv = document.createElement('div');
-        // Add classes for styling (e.g., 'message bot' or 'message user')
-        messageDiv.classList.add('message', sender);
-        // *** ADD THIS LINE ***
-        messageDiv.textContent = text; // Set the actual text content
-        // *** END FIX ***
-        chatbox.appendChild(messageDiv);
-        // Scroll to the bottom
+    /**
+     * Adds a message to the chatbox.
+     * @param {string} sender - 'user' or 'bot'
+     * @param {string} text - The message text
+     * @param {string} [userMessage] - The original user message (only for bot replies)
+     */
+    function addMessage(sender, text, userMessage = null) {
+        const messageWrapper = document.createElement('div');
+        messageWrapper.classList.add('message', sender);
+        
+        // Add text content
+        const messageText = document.createElement('span');
+        messageText.textContent = text;
+        messageWrapper.appendChild(messageText);
+
+        // If it's a bot message (and not the initial welcome), add feedback UI
+        if (sender === 'bot' && userMessage) {
+            const feedbackContainer = document.createElement('div');
+            feedbackContainer.classList.add('feedback-container');
+
+            // 1. The Buttons Container
+            const buttonsDiv = document.createElement('div');
+            buttonsDiv.classList.add('feedback-buttons');
+            
+            // Helper to create buttons
+            const createFeedbackBtn = (ratingType) => {
+                const btn = document.createElement('button');
+                btn.classList.add('feedback-btn', ratingType === 'good' ? 'thumb-up' : 'thumb-down');
+                btn.dataset.rating = ratingType;
+                // SVG Icons
+                btn.innerHTML = ratingType === 'good' 
+                    ? '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>'
+                    : '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v7a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zM17 2h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"></path></svg>';
+                
+                btn.addEventListener('click', () => {
+                    // Hide buttons, show comment box
+                    buttonsDiv.style.display = 'none';
+                    commentDiv.style.display = 'flex';
+                    // Store rating on the comment div for later retrieval
+                    commentDiv.dataset.rating = ratingType;
+                    commentInput.focus();
+                });
+                return btn;
+            };
+
+            const thumbUpBtn = createFeedbackBtn('good');
+            const thumbDownBtn = createFeedbackBtn('bad');
+            
+            buttonsDiv.appendChild(thumbUpBtn);
+            buttonsDiv.appendChild(thumbDownBtn);
+            feedbackContainer.appendChild(buttonsDiv);
+
+            // 2. The Comment Box (Hidden initially)
+            const commentDiv = document.createElement('div');
+            commentDiv.classList.add('feedback-comment-box');
+            // Style handles display:none via CSS class usually, but ensure it here
+            commentDiv.style.display = 'none'; 
+
+            const commentInput = document.createElement('input');
+            commentInput.type = 'text';
+            commentInput.placeholder = 'Optional comment...';
+            
+            const submitBtn = document.createElement('button');
+            submitBtn.textContent = 'Submit';
+
+            commentDiv.appendChild(commentInput);
+            commentDiv.appendChild(submitBtn);
+            feedbackContainer.appendChild(commentDiv);
+
+            messageWrapper.appendChild(feedbackContainer);
+
+            // 3. Submit Feedback Logic
+            const sendFeedback = async () => {
+                const rating = commentDiv.dataset.rating;
+                const comment = commentInput.value.trim();
+                
+                // Show visual feedback immediately
+                feedbackContainer.innerHTML = '<span class="feedback-thanks">Thanks for your feedback!</span>';
+
+                try {
+                    await fetch('/feedback', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            user_message: userMessage,
+                            bot_response: text,
+                            rating: rating,
+                            comment: comment
+                        }),
+                    });
+                } catch (error) {
+                    console.error('Feedback error:', error);
+                }
+            };
+
+            submitBtn.addEventListener('click', sendFeedback);
+            commentInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault(); // Prevent chat form submit
+                    sendFeedback();
+                }
+            });
+        }
+
+        chatbox.appendChild(messageWrapper);
         chatbox.scrollTop = chatbox.scrollHeight;
     }
 
@@ -25,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!messageText) return;
 
-        addMessage('user', messageText); // Display user message
+        addMessage('user', messageText); // Display user's message
         userInput.value = ''; // Clear input
 
         try {
@@ -40,8 +135,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
 
             if (response.ok) {
-                // Make sure data.reply exists and is passed correctly
-                addMessage('bot', data.reply);
+                // Pass both bot reply AND original user message so feedback works
+                addMessage('bot', data.reply, messageText); 
             } else {
                 errorMessage.textContent = data.error || data.msg || 'Error sending message.';
                 if (response.status === 401 || response.status === 422 ) {
@@ -53,9 +148,4 @@ document.addEventListener('DOMContentLoaded', () => {
             errorMessage.textContent = 'Could not connect to the server.';
         }
     });
-
-
-    addMessage('bot', "Hello! I'm your wellness assistant. You can ask me about symptoms, first-aid, or general wellness tips.");
-
 });
-
