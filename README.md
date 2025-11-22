@@ -11,9 +11,9 @@
 [![NLTK](https://img.shields.io/badge/NLTK-154F3C?style=for-the-badge&logo=nltk&logoColor=white)](https://nltk.org)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-[![Stars](https://img.shields.io/github/stars/username/wellbot?style=for-the-badge&color=gold)](https://github.com/username/wellbot/stargazers)
-[![Issues](https://img.shields.io/github/issues/username/wellbot?style=for-the-badge&color=red)](https://github.com/username/wellbot/issues)
-[![Forks](https://img.shields.io/github/forks/username/wellbot?style=for-the-badge&color=blue)](https://github.com/username/wellbot/network/members)
+[![Stars](https://img.shields.io/github/stars/username/wellbot?style=for-the-badge&color=gold)](https://github.com/nirmalkumar047/Wellbot-infosys)
+[![Issues](https://img.shields.io/github/issues/username/wellbot?style=for-the-badge&color=red)](https://github.com/nirmalkumar047/Wellbot-infosys)
+[![Forks](https://img.shields.io/github/forks/username/wellbot?style=for-the-badge&color=blue)](https://github.com/nirmalkumar047/Wellbot-infosys)
 
 ![WellBot Demo](https://via.placeholder.com/800x400/4A90E2/FFFFFF?text=WellBot+Chat+Interface)
 
