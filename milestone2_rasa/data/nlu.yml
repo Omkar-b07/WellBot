@@ -1,0 +1,309 @@
+version: "3.1"
+
+nlu:
+- intent: greet
+  examples: |
+    - hey
+    - hello
+    - hi
+    - hi there
+    - good morning
+    - good evening
+    - hey bot
+    - howdy
+    - greetings
+    - what's up?
+
+- intent: goodbye
+  examples: |
+    - bye
+    - goodbye
+    - see you later
+    - see ya
+    - ciao
+    - farewell
+    - take care
+    - bye bye
+    - thanks, that's all
+
+- intent: ask_symptom
+  examples: |
+    - what are the symptoms of a [cold](condition)?
+    - symptoms for [headache](condition)
+    - [migraine](condition) symptoms
+    - tell me about [covid-19](condition) symptoms
+    - signs of a [cold](condition)
+    - symptoms of [flu](condition)
+    - show symptoms for [headache](condition)
+    - what symptoms does [flu](condition) have
+    - list the symptoms for [allergy](condition)
+    - describe [sprain](condition) symptoms
+    - I think I have the [flu](condition), what are the signs?
+    - how do I know if I have an [allergy](condition)?
+    - what does a [migraine](condition) feel like?
+    - maybe i got a [cold](condition)
+    - what happens when you have a [cold](condition)?
+    - tell me about the [flu](condition)
+    - how does [covid-19](condition) manifest?
+    - what are the symptoms?
+    - tell me the signs
+    - list symptoms
+    - tell me about [pink eye](condition)
+    - what are the signs of [chickenpox](condition)
+    - symptoms of [food poisoning](condition)
+    - how do I know if I have [gastritis](condition)?
+    - what are symptoms of [dehydration](condition)?
+    - [insomnia](condition) symptoms
+    - what are [stomach ache](condition) symptoms?
+    - tell me about [constipation](condition)
+    - what are [seasonal allergies](condition)?
+    - signs of [strep throat](condition)
+    - what is a [uti](condition)?
+    - what does [eczema](condition) look like?
+    - symptoms of [acne](condition)
+    - do I have [bronchitis](condition)?
+    - what are symptoms of [depression](condition)?
+    - signs of [diabetes](condition)
+    - what is [hypertension](condition)?
+    - what are the symptoms of a [bad](severity) [cold](condition)?
+    - symptoms for [headache](condition) [for 3 days](duration)
+    - signs of a [mild](severity) [cold](condition)
+    - what does a [terrible](severity) [migraine](condition) feel like?
+    - what are the signs of [chickenpox](condition) on my [stomach](location)?
+
+- intent: ask_first_aid
+  examples: |
+    - what to do for a [minor burn](condition)?
+    - how do I treat a [scrape](condition)?
+    - first aid for a [sprain](condition)
+    - first aid for a [cut](condition)
+    - what to do for a [nosebleed](condition)?
+    - [insect bite](condition) first aid
+    - how to treat a [cut](condition)
+    - treatment for [headache](condition)
+    - how to deal with a [headache](condition)
+    - what is the first aid for [flu](condition)
+    - what should i do for mild [headache](condition)
+    - I got a [minor burn](condition), what now?
+    - how to handle a [scrape](condition)
+    - dealing with a [nosebleed](condition)
+    - treating an [insect bite](condition)
+    - help with a [sprain](condition)
+    - advice for a [cut](condition)
+    - what is the first aid?
+    - how do I treat this?
+    - what to do for [food poisoning](condition)
+    - how to treat [dehydration](condition)
+    - what to do for [choking](condition)?
+    - i got a [bee sting](condition)
+    - what to do for [heat exhaustion](condition)?
+    - help, [heatstroke](condition)
+    - [hypothermia](condition) first aid
+    - i think i have a [fracture](condition)
+    - what to do for a [seizure](condition)?
+    - [anaphylaxis](condition) help
+    - what to do for [poison ivy](condition)?
+    - i have an [object in my eye](location)
+    - how to help [constipation](condition)
+    - what to do for a [minor](severity) [burn](condition)?
+    - how do I treat a [scrape](condition) on my [knee](location)?
+    - first aid for a [bad](severity) [sprain](condition)
+    - first aid for a [deep](severity) [cut](condition) [on my hand](location)
+    - what to do for a [nosebleed](condition) that won't stop?
+    - treatment for a [splitting](severity) [headache](condition)
+    - I got a [minor burn](condition) [on my arm](location), what now?
+    - what to do for [food poisoning](condition) [since yesterday](duration)?
+
+- intent: ask_wellness_tip
+  examples: |
+    - give me a tip for [sleep](condition)
+    - how to manage [stress](condition)
+    - tell me about a good [diet](condition)
+    - [hydration](condition) tips
+    - tell me about [exercise](condition)
+    - tips for good [posture](condition)
+    - how to practice [hand washing](condition)
+    - wellness tip for [headache](condition)
+    - how to stay hydrated
+    - advice for better [sleep](condition)
+    - how to reduce [stress](condition)
+    - tips for healthy [diet](condition)
+    - give me a health tip
+    - wellness advice
+    - how can I be healthier?
+    - give me a tip
+    - any wellness tips?
+    - tell me about [meditation](condition)
+    - what is [mindfulness](condition)?
+    - tip for [social connection](condition)
+    - [work-life balance](condition) tips
+    - what are [healthy fats](condition)?
+    - tell me about [fiber](condition)
+    - [protein](condition) tip
+    - [carbohydrates](condition) tip
+    - do i need [vitamins](condition)?
+    - [alcohol](condition) tips
+    - help with [smoking](condition)
+    - tell me about [yoga](condition)
+    - what is [cardio exercise](condition)?
+    - tip for [strength training](condition)
+    - tip for [constipation](condition)
+    - [nutrition](condition) advice
+    - [mental health](condition) tip
+    - tip for [screen time](condition)
+    - [insomnia](condition) tip
+    - how to manage [stress](condition) [at work](location)
+
+- intent: inform
+  examples: |
+    - i am having a [cold](condition)
+    - i have a [cold](condition)
+    - my issue is [stress](condition)
+    - i feel [stress](condition)
+    - i have a [headache](condition)
+    - i got a [minor burn](condition)
+    - it's a [scrape](condition)
+    - i have a mild [headache](condition)
+    - i feel like i have the [flu](condition)
+    - [cold](condition)
+    - [flu](condition)
+    - [stress](condition)
+    - it's about [migraine](condition)
+    - [minor burn](condition)
+    - [allergy](condition)
+    - [sprain](condition)
+    - i have a runny nose
+    - i feel feverish
+    - my head hurts
+    - i have a [fever](condition)
+    - i'm running a [fever](condition)
+    - my temperature is high
+    - i have [pink eye](condition)
+    - i ate bad food, [food poisoning](condition)
+    - i have [anxiety](condition)
+    - i think i have a [uti](condition)
+    - [diabetes](condition)
+    - i have [constipation](condition)
+    - i am having a [severe](severity) [cold](condition) [for three days](duration)
+    - i have a [rash](condition) on my [left arm](location)
+    - i have a mild [headache](condition) [since this morning](duration)
+    - i have a runny nose [for 2 days](duration)
+    - my [head](location) hurts
+    - i'm running a [fever](condition) [since last night](duration)
+    - i have [pink eye](condition) in [both eyes](location)
+
+- intent: general_query
+  examples: |
+    - okk what can i do
+    - tell me more
+    - what should I do?
+    - any advice?
+    - tell me about prevention
+    - what precautions should I take?
+
+- intent: ask_prevention
+  examples: |
+    - how can i prevent getting [flu](condition)
+    - prevention tips for [flu](condition)
+    - tips to avoid the [flu](condition)
+    - how to prevent [cold](condition)
+    - cold prevention
+    - preventation tips for [cold](condition)
+    - prevention measures for [flu](condition)
+    - what are precautions for [cold](condition)
+    - how do I avoid getting a [cold](condition)?
+    - prevention for [diarrhea](condition)
+    - how to not get [diarahea](condition)?
+    - what are the precautions for [flu](condition)?
+    - how to prevent [diabetes](condition)
+    - [heart disease](condition) prevention
+    - prevent [strep throat](condition)
+    - prevent [uti](condition)
+    - [sun safety](condition) tips
+    - how to prevent [back pain](condition)
+    - prevent [food poisoning](condition)
+    - prevent [pink eye](condition)
+    - [chickenpox](condition) prevention
+    - what are precautions for [food poisoning](condition)
+    - what are preventation measures
+    - prevention measures for [flu](condition)
+    - what are precautions for [pink eye](condition)
+    - how to prevent [back pain](condition)
+
+- lookup: condition
+  examples: |
+    - cold
+    - flu
+    - covid-19
+    - allergy
+    - headache
+    - migraine
+    - sprain
+    - minor burn
+    - scrape
+    - cut
+    - insect bite
+    - nosebleed
+    - sleep
+    - hydration
+    - exercise
+    - stress
+    - diet
+    - hand washing
+    - posture
+    - fever
+    - diarrhea
+    - anxiety
+    - chickenpox
+    - pink eye
+    - food poisoning
+    - dehydration
+    - insomnia
+    - stomach ache
+    - gastritis
+    - constipation
+    - seasonal allergies
+    - strep throat
+    - uti
+    - eczema
+    - psoriasis
+    - acne
+    - bronchitis
+    - pneumonia
+    - sinusitis
+    - depression
+    - diabetes
+    - hypertension
+    - heat exhaustion
+    - heatstroke
+    - hypothermia
+    - fracture
+    - seizure
+    - anaphylaxis
+    - poison ivy
+    - object in eye
+    - choking
+    - bee sting
+    - meditation
+    - mindfulness
+    - social connection
+    - work-life balance
+    - healthy fats
+    - fiber
+    - protein
+    - carbohydrates
+    - vitamins
+    - alcohol
+    - smoking
+    - yoga
+    - cardio exercise
+    - strength training
+    - hygiene
+    - nutrition
+    - mental health
+    - screen time
+    - heart disease
+    - sun safety
+    - back pain
+    - default
+    - rash

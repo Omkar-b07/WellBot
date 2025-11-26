@@ -1,0 +1,41 @@
+version: "3.1"
+
+language: xx   # multilingual support for English + Hindi
+
+pipeline:
+- name: WhitespaceTokenizer
+
+- name: RegexFeaturizer
+  use_lookup_tables: true
+
+- name: LexicalSyntacticFeaturizer
+
+- name: CountVectorsFeaturizer
+  analyzer: "word"
+
+- name: CountVectorsFeaturizer
+  analyzer: "char_wb"
+  min_ngram: 1
+  max_ngram: 4
+
+- name: DIETClassifier
+  epochs: 150
+  entity_recognition: true
+  use_lookup_tables: true
+
+- name: EntitySynonymMapper
+
+- name: FallbackClassifier
+  threshold: 0.3
+  ambiguity_threshold: 0.1
+
+policies:
+- name: MemoizationPolicy
+- name: RulePolicy
+- name: UnexpecTEDIntentPolicy
+  max_history: 5
+  epochs: 100
+- name: TEDPolicy
+  max_history: 5
+  epochs: 100
+assistant_id: 20251117-155338-connected-terrier

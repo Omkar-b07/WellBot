@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Profile</title>
+    <!-- Add Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="auth-page"> <!-- Add class to body -->
+    
+    <div class="auth-page-wrapper">
+        <!-- 1. Branding Column -->
+        <div class="auth-brand-column">
+            <div class="brand-content">
+                <h2>Wellness Guide Bot</h2>
+                <p>Your AI-powered health assistant. Here to help.</p>
+            </div>
+        </div>
+
+        <!-- 2. Form Column -->
+        <div class="auth-form-column">
+            <div class="container">
+                <h1>Your Profile</h1>
+                <p class="subtitle">Update your account settings.</p>
+
+                <div class="profile-display">
+                    <strong>Email:</strong> <span id="emailDisplay">Loading...</span>
+                </div>
+
+                <form id="profileForm">
+                    <label for="edit_age_group">Age Group:</label>
+                    <select id="edit_age_group" name="age_group">
+                        <option value="">-- Select Age Group --</option>
+                        <option value="18-24">18-24</option>
+                        <option value="25-34">25-34</option>
+                        <option value="35-44">35-44</option>
+                        <option value="45-54">45-54</option>
+                        <option value="55+">55+</option>
+                        <option value="under_18">Under 18</option>
+                    </select>
+
+                    <label for="edit_preferred_language">Preferred Language:</label>
+                    <select id="edit_preferred_language" name="preferred_language">
+                        <option value="en">English</option>
+                        <option value="hi">Hindi</option>
+                    </select>
+
+                    <button type="submit">Update Profile</button>
+                </form>
+                <p id="profileSuccessMessage" class="success"></p>
+                <p id="profileErrorMessage" class="error"></p>
+
+                <p class="auth-switch"><a href="{{ url_for('chat_page') }}">Back to Chat</a></p>
+                <!-- Remove the logout button from here, it's in the chat nav -->
+            </div>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>
+</html>
+

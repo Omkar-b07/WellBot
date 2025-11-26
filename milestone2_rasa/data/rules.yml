@@ -1,0 +1,104 @@
+version: "3.1"
+
+rules:
+
+  # ---------------- SYSTEM START ----------------
+  - rule: Send disclaimer on session start
+    conversation_start: true
+    steps:
+      - action: utter_disclaimer
+      - action: utter_greet
+
+  # ---------------- GREET ----------------
+  - rule: Say hello when user greets
+    steps:
+      - intent: greet
+      - action: utter_greet
+
+  # ---------------- GOODBYE ----------------
+  - rule: Say goodbye anytime the user says goodbye
+    steps:
+      - intent: goodbye
+      - action: utter_goodbye
+
+  # ---------------- INFORM ----------------
+  - rule: Handle inform intent
+    steps:
+      - intent: inform
+      - action: action_query_knowledge_base
+
+
+  # =======================================================
+  #           ASK SYMPTOM RULES
+  # =======================================================
+
+  - rule: Handle asking for symptom when condition is missing
+    steps:
+      - intent: ask_symptom
+      - slot_was_set:
+          - condition: null
+      - action: utter_ask_condition
+
+  - rule: Provide symptom info when condition is known
+    steps:
+      - intent: ask_symptom
+      - slot_was_set:
+          - condition: not null
+      - action: action_query_knowledge_base
+
+
+  # =======================================================
+  #           ASK FIRST AID RULES
+  # =======================================================
+
+  - rule: Handle asking for first aid when condition is missing
+    steps:
+      - intent: ask_first_aid
+      - slot_was_set:
+          - condition: null
+      - action: utter_ask_condition
+
+  - rule: Provide first aid info when condition is known
+    steps:
+      - intent: ask_first_aid
+      - slot_was_set:
+          - condition: not null
+      - action: action_query_knowledge_base
+
+
+  # =======================================================
+  #           ASK WELLNESS TIP RULES
+  # =======================================================
+
+  - rule: Handle asking for wellness tip when condition is missing
+    steps:
+      - intent: ask_wellness_tip
+      - slot_was_set:
+          - condition: null
+      - action: utter_ask_condition
+
+  - rule: Provide wellness tip info when condition is known
+    steps:
+      - intent: ask_wellness_tip
+      - slot_was_set:
+          - condition: not null
+      - action: action_query_knowledge_base
+
+
+  # =======================================================
+  #           ASK PREVENTION RULES  (FIXED)
+  # =======================================================
+
+  - rule: Handle asking for prevention when condition is missing
+    steps:
+      - intent: ask_prevention
+      - slot_was_set:
+          - condition: null
+      - action: utter_ask_condition
+
+  - rule: Provide prevention info when condition is known
+    steps:
+      - intent: ask_prevention
+      - slot_was_set:
+          - condition: not null
+      - action: action_query_knowledge_base

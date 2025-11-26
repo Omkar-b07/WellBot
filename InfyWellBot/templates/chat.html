@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wellness Bot Chat</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Inline style for the Language Button to ensure it looks good immediately -->
+    <style>
+        .lang-switch-btn {
+            background: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .lang-switch-btn:hover {
+            background-color: var(--primary-color);
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body class="chat-page">
+    
+    <div class="page-container">
+
+        <!-- 1. Navigation Sidebar -->
+        <nav class="chat-nav-sidebar">
+            <div class="nav-logo">
+                WellBot
+            </div>
+            <ul class="nav-links">
+                <li class="nav-item active">
+                    <a href="{{ url_for('chat_page') }}" title="Chat">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                        <span>Chat</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('profile_page') }}" title="Profile">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        <span>Profile</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="nav-footer">
+                <button id="logoutButton" class="logout-button" title="Logout">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- 2. Main Chat Area -->
+        <div class="chat-container">
+            <!-- Header with Language Button -->
+            <header class="chat-header">
+                <h1>Wellness Guide Bot</h1>
+                <div class="header-right">
+                    <!-- FUNCTIONAL LANGUAGE BUTTON -->
+                    <button id="langSwitchBtn" class="lang-switch-btn" data-current="{{ current_language }}">
+                        {% if current_language == 'en' %}
+                            Switch to Hindi (हिन्दी)
+                        {% else %}
+                            Switch to English
+                        {% endif %}
+                    </button>
+                </div>
+            </header>
+
+            <!-- Chatbox -->
+            <div id="chatbox">
+                <!-- Static Welcome Message -->
+                <div class="message bot welcome-message">
+                    <div class="avatar">🤖</div>
+                    <div class="message-content">
+                        <p>Hello! I'm your Wellness Guide Bot. I can provide health information in multiple languages.</p>
+                        <p class="disclaimer"><strong>Note:</strong> The information provided is for general guidance and not a substitute for professional medical advice.</p>
+                        <p class="prompt-heading">Try asking:</p>
+                        <code>what are the symptoms of flu</code>
+                        <code>how to prevent a cold</code>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input -->
+            <form id="messageForm">
+                <input type="text" id="userInput" placeholder="Type your message..." autocomplete="off">
+                <button type="submit">Send</button>
+            </form>
+            <p id="errorMessage" class="error"></p>
+        </div>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+--- Python Virtual Environments ---
+
+.venv/
+venv/
+*.venv/
+.env/
+
+--- Python Cache ---
+
+pycache/
+*.py[cod]
+*.pyc
+
+--- Rasa Specific ---
+
+Ignore trained models (they are large and can be re-trained)
+
+models/*.tar.gz
+
+Ignore Rasa's internal cache and DBs
+
+.rasa/
+
+--- Database Files ---
+
+Ignore the SQLite database file (it contains local data)
+
+*.db
+*.sqlite
+*.sqlite3
+
+--- OS & IDE Files ---
+
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

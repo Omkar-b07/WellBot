@@ -1,0 +1,417 @@
+version: "3.1"
+
+nlu:
+
+# ---------------- GREET ----------------
+- intent: greet
+  examples: |
+    - नमस्ते
+    - नमस्कार
+    - हे
+    - हाय
+    - सुप्रभात
+
+# ---------------- GOODBYE ----------------
+- intent: goodbye
+  examples: |
+    - अलविदा
+    - बाय
+    - फिर मिलेंगे
+    - धन्यवाद, बस इतना ही
+
+# ---------------- ASK SYMPTOM ----------------
+- intent: ask_symptom
+  examples: |
+    - [सर्दी](condition) के लक्षण क्या हैं?
+    - [तीन दिनों से](duration) [सर्दी](condition) के लक्षण क्या हैं?
+    - [बुरा](severity) [सिरदर्द](condition) के लक्षण
+    - [माइग्रेन](condition) के लक्षण
+    - [कोविड-19](condition) के लक्षणों के बारे में बताएं
+    - [चिकनपॉक्स](condition) के लक्षण क्या हैं?
+    - मेरे [पेट पर](location) [चिकनपॉक्स](condition) के क्या लक्षण हैं?
+    - [आंख आना](condition) (pink eye) के बारे में बताएं
+
+# ---------------- ASK FIRST AID ----------------
+- intent: ask_first_aid
+  examples: |
+    - [मामूली जलने](condition) (minor burn) पर क्या करें?
+    - [खरोंच](condition) (scrape) का इलाज कैसे करें?
+    - [मोच](condition) (sprain) के लिए प्राथमिक उपचार
+    - [नकसीर](condition) (nosebleed) फूटने पर क्या करें?
+    - [कीड़े के काटने](condition) (insect bite) पर प्राथमिक उपचार
+    - [सिरदर्द](condition) (headache) का इलाज
+    - [मधुमक्खी के डंक](condition) (bee sting) पर क्या करें?
+
+# ---------------- ASK WELLNESS TIP ----------------
+- intent: ask_wellness_tip
+  examples: |
+    - [नींद](condition) (sleep) के लिए एक टिप दें
+    - [तनाव](condition) (stress) का प्रबंधन कैसे करें?
+    - अच्छे [आहार](condition) (diet) के बारे में बताएं
+    - [हाइड्रेशन](condition) (hydration) टिप्स
+
+# ---------------- INFORM ----------------
+- intent: inform
+  examples: |
+    - मुझे [सर्दी](condition) है [दो दिनों से](duration)
+    - मुझे [बहुत](severity) [तनाव](condition) महसूस हो रहा है
+    - मुझे [हल्का](severity) [सिरदर्द](condition) है
+    - मैं [बुखार](condition) से पीड़ित हूँ
+    - मेरे [सिर में](location) [दर्द](condition) है
+    - [सर्दी](condition)
+    - [फ्लू](condition)
+    - [तनाव](condition)
+    - [बुखार](condition)
+    - मेरे [हाथ पर](location) [रैश](condition) है
+
+# ---------------- GENERAL QUERY ----------------
+- intent: general_query
+  examples: |
+    - मैं क्या कर सकता हूँ
+    - और बताओ
+    - मुझे क्या करना चाहिए?
+    - कोई सलाह?
+
+# ---------------- ASK PREVENTION ----------------
+- intent: ask_prevention
+  examples: |
+    - [फ्लू](condition) (flu) से कैसे बचें?
+    - [सर्दी](condition) (cold) से बचाव के उपाय
+    - [डायरिया](condition) (diarrhea) की रोकथाम
+    - [मधुमेह](condition) (diabetes) को कैसे रोकें?
+    - [पीठ दर्द](condition) (back pain) से कैसे बचें?
+
+# ---------------- LOOKUP TABLE ----------------
+- lookup: condition
+  examples: |
+    - सर्दी
+    - फ्लू
+    - कोविड-19
+    - एलर्जी
+    - सिरदर्द
+    - माइग्रेन
+    - मोच
+    - मामूली जलने
+    - खरोंच
+    - कटने
+    - कीड़े के काटने
+    - नकसीर
+    - नींद
+    - हाइड्रेशन
+    - व्यायाम
+    - तनाव
+    - आहार
+    - हाथ धोना
+    - आसन
+    - बुखार
+    - दस्त
+    - चिंता
+    - चिकनपॉक्स
+    - आंख आना
+    - फूड पॉइजनिंग
+    - डिहाइड्रेशन
+    - अनिद्रा
+    - पेट दर्द
+    - कब्ज
+    - मधुमेह
+    - उच्च रक्तचाप
+    - दम घुटना
+    - मधुमक्खी का डंक
+    - दिल की बीमारी
+    - पीठ दर्द
+    - रैश
+
+# ----------------------------------------------------------
+#  HINDI → ENGLISH SYNONYMS (Required for DB Matching)
+# ----------------------------------------------------------
+
+# ---- Symptom-related ----
+- synonym: cold
+  examples: |
+    - सर्दी
+    - जुकाम
+    - नज़ला
+
+- synonym: flu
+  examples: |
+    - फ्लू
+    - इन्फ्लूएंजा
+
+- synonym: covid-19
+  examples: |
+    - कोविड-19
+    - कोरोना
+    - कोरोना वायरस
+
+- synonym: headache
+  examples: |
+    - सिरदर्द
+    - सर दर्द
+
+- synonym: migraine
+  examples: |
+    - माइग्रेन
+    - तेज सिरदर्द
+
+- synonym: fever
+  examples: |
+    - बुखार
+    - ताप
+
+- synonym: diarrhea
+  examples: |
+    - दस्त
+    - डायरिया
+
+- synonym: anxiety
+  examples: |
+    - चिंता
+    - बेचैनी
+
+- synonym: chickenpox
+  examples: |
+    - चिकनपॉक्स
+    - छोटी माता
+
+- synonym: pink eye
+  examples: |
+    - आंख आना
+    - कंजंक्टिवाइटिस
+
+- synonym: food poisoning
+  examples: |
+    - फूड पॉइजनिंग
+    - खाने की वजह से ज़हर
+
+- synonym: dehydration
+  examples: |
+    - डिहाइड्रेशन
+    - निर्जलीकरण
+
+- synonym: insomnia
+  examples: |
+    - अनिद्रा
+    - नींद न आना
+
+- synonym: stomach ache
+  examples: |
+    - पेट दर्द
+    - पेट में दर्द
+
+- synonym: gastritis
+  examples: |
+    - गैस्ट्राइटिस
+    - पेट में जलन
+
+- synonym: constipation
+  examples: |
+    - कब्ज
+    - पेट साफ न होना
+
+- synonym: seasonal allergies
+  examples: |
+    - मौसमी एलर्जी
+    - सीज़नल एलर्जी
+
+- synonym: strep throat
+  examples: |
+    - स्ट्रेप थ्रोट
+    - गले में संक्रमण
+
+- synonym: uti
+  examples: |
+    - यूटीआई
+    - मूत्र संक्रमण
+
+- synonym: eczema
+  examples: |
+    - एक्जिमा
+    - खुजली वाली त्वचा
+
+- synonym: acne
+  examples: |
+    - मुंहासे
+    - पिंपल
+
+- synonym: bronchitis
+  examples: |
+    - ब्रोंकाइटिस
+    - सांस की नली में सूजन
+
+- synonym: depression
+  examples: |
+    - डिप्रेशन
+    - अवसाद
+
+- synonym: diabetes
+  examples: |
+    - मधुमेह
+    - डायबिटीज
+
+- synonym: hypertension
+  examples: |
+    - उच्च रक्तचाप
+    - हाई बीपी
+
+# ---- First-aid related ----
+- synonym: minor burn
+  examples: |
+    - मामूली जलन
+    - हल्की जलन
+    - जलना
+
+- synonym: scrape
+  examples: |
+    - खरोंच
+    - छिल जाना
+
+- synonym: cut
+  examples: |
+    - कट
+    - कटना
+    - घाव
+
+- synonym: insect bite
+  examples: |
+    - कीड़े का काटना
+    - कीड़े के काटने
+
+- synonym: sprain
+  examples: |
+    - मोच
+
+- synonym: nosebleed
+  examples: |
+    - नकसीर
+    - नाक से खून आना
+
+- synonym: fracture
+  examples: |
+    - फ्रैक्चर
+    - हड्डी टूटना
+
+- synonym: seizure
+  examples: |
+    - दौरा
+    - फिट
+
+- synonym: choking
+  examples: |
+    - दम घुटना
+    - सांस अटकना
+
+- synonym: bee sting
+  examples: |
+    - मधुमक्खी का डंक
+    - डंक लगना
+
+- synonym: heat exhaustion
+  examples: |
+    - हीट एग्जॉशन
+    - गर्मी से थकावट
+
+- synonym: heatstroke
+  examples: |
+    - हीटस्ट्रोक
+    - लू लगना
+
+- synonym: hypothermia
+  examples: |
+    - हाइपोथर्मिया
+    - शरीर का तापमान कम होना
+
+- synonym: object in eye
+  examples: |
+    - आंख में कुछ चला गया
+    - आंख में वस्तु
+
+# ---- Wellness tips ----
+- synonym: sleep
+  examples: |
+    - नींद
+    - सोना
+
+- synonym: stress
+  examples: |
+    - तनाव
+    - स्ट्रेस
+
+- synonym: diet
+  examples: |
+    - आहार
+    - खाना
+
+- synonym: hydration
+  examples: |
+    - हाइड्रेशन
+    - पानी पीना
+
+- synonym: exercise
+  examples: |
+    - व्यायाम
+    - एक्सरसाइज
+
+- synonym: hygiene
+  examples: |
+    - स्वच्छता
+    - साफ-सफाई
+
+- synonym: nutrition
+  examples: |
+    - पोषण
+    - न्यूट्रिशन
+
+- synonym: mental health
+  examples: |
+    - मानसिक स्वास्थ्य
+
+- synonym: screen time
+  examples: |
+    - स्क्रीन टाइम
+    - मोबाइल समय
+
+- synonym: meditation
+  examples: |
+    - ध्यान
+    - मेडिटेशन
+
+- synonym: mindfulness
+  examples: |
+    - माइंडफुलनेस
+    - सचेतनता
+
+- synonym: social connection
+  examples: |
+    - सामाजिक संबंध
+
+- synonym: work-life balance
+  examples: |
+    - काम-जीवन संतुलन
+
+# ---- Prevention ----
+- synonym: heart disease
+  examples: |
+    - दिल की बीमारी
+
+- synonym: sun safety
+  examples: |
+    - धूप से सुरक्षा
+
+- synonym: back pain
+  examples: |
+    - पीठ दर्द
+
+- synonym: flu
+  examples: |
+    - फ्लू
+    - इन्फ्लूएंजा
+
+- synonym: diabetes
+  examples: |
+    - मधुमेह
+    - डायबिटीज
+
+- synonym: back pain
+  examples: |
+    - पीठ दर्द
+    - कमर दर्द

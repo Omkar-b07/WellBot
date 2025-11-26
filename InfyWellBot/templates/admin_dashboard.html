@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wellness Admin</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome for Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="admin-body">
+    <div class="admin-layout">
+      <!-- 1. Sidebar Navigation -->
+      <aside class="admin-sidebar">
+        <div class="sidebar-header">
+          <div class="logo-icon"><i class="fas fa-heartbeat"></i></div>
+          <span class="logo-text">WellnessBot</span>
+        </div>
+
+        <nav class="sidebar-nav">
+          <a href="#" class="nav-link active">
+            <i class="fas fa-th-large"></i> <span>Dashboard</span>
+          </a>
+          <a href="#feedback-section" class="nav-link">
+            <i class="fas fa-comments"></i> <span>Feedback</span>
+          </a>
+          <a href="#knowledge-section" class="nav-link">
+            <i class="fas fa-book-medical"></i> <span>Knowledge Base</span>
+          </a>
+          <a href="#users-section" class="nav-link">
+            <i class="fas fa-users"></i> <span>User Logs</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="admin-user-profile">
+            <div class="admin-avatar"><i class="fas fa-user"></i></div>
+            <div class="admin-info">
+              <span class="admin-name">Administrator</span>
+              <span class="admin-email">{{ session.get('admin_email') }}</span>
+            </div>
+          </div>
+          <a
+            href="{{ url_for('admin_logout') }}"
+            class="logout-link"
+            title="Logout"
+          >
+            <i class="fas fa-sign-out-alt"></i>
+          </a>
+        </div>
+      </aside>
+
+      <!-- 2. Main Content Area -->
+      <main class="admin-main">
+        <!-- Top Header -->
+        <header class="main-header">
+          <h1>Dashboard Overview</h1>
+          <div class="date-display">
+            <i class="far fa-calendar-alt"></i> <span id="currentDate"></span>
+          </div>
+        </header>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+          <div class="alert {{ category }}">
+            <i class="fas fa-info-circle"></i> {{ message }}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %} {% endwith %}
+
+        <!-- Stats Grid (Key Performance Indicators) -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-content">
+              <p class="stat-label">Total Users</p>
+              <h3 class="stat-value">{{ total_users }}</h3>
+            </div>
+            <div class="stat-icon-bg blue"><i class="fas fa-users"></i></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-content">
+              <p class="stat-label">Satisfaction</p>
+              <h3 class="stat-value">{{ satisfaction_rate }}%</h3>
+            </div>
+            <div class="stat-icon-bg green"><i class="fas fa-smile"></i></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-content">
+              <p class="stat-label">Total Feedback</p>
+              <h3 class="stat-value">{{ total_feedback }}</h3>
+            </div>
+            <div class="stat-icon-bg purple">
+              <i class="fas fa-comment-alt"></i>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-content">
+              <p class="stat-label">Knowledge Base</p>
+              <h3 class="stat-value">
+                {{ total_tips }} <small>entries</small>
+              </h3>
+            </div>
+            <div class="stat-icon-bg orange">
+              <i class="fas fa-database"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-grid">
+          <div class="card chart-card">
+            <div class="card-header">
+              <h3>User Sentiment</h3>
+            </div>
+            <div class="card-body chart-wrapper">
+              <canvas id="feedbackChart"></canvas>
+            </div>
+          </div>
+          <div class="card chart-card">
+            <div class="card-header">
+              <h3>User Queries (Daily Activity)</h3>
+            </div>
+            <div class="card-body chart-wrapper">
+              <canvas id="activityChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feedback Table -->
+        <div class="card" id="feedback-section">
+          <div class="card-header">
+            <h3>Recent User Feedback</h3>
+          </div>
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>User ID</th>
+                  <th>Message</th>
+                  <th>Comment</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for feedback in feedback_logs %}
+                <tr>
+                  <td>
+                    <span
+                      class="status-badge {{ 'status-success' if feedback.rating == 'good' else 'status-error' }}"
+                    >
+                      {{ feedback.rating|title }}
+                    </span>
+                  </td>
+                  <td><span class="mono-text">{{ feedback.user_id }}</span></td>
+                  <td title="{{ feedback.user_message }}">
+                    {{ feedback.user_message | truncate(40) }}
+                  </td>
+                  <td>{{ feedback.comment or '' }}</td>
+                  <td class="text-muted">
+                    {{ feedback.timestamp.strftime('%Y-%m-%d') }}
+                  </td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td colspan="5" class="text-center">
+                    No feedback data available.
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Add Tip Section -->
+        <div class="card" id="knowledge-section">
+          <div class="card-header">
+            <h3>Add to Knowledge Base</h3>
+          </div>
+          <div class="card-body">
+            <form
+              action="{{ url_for('admin_add_tip') }}"
+              method="POST"
+              class="admin-form-grid"
+            >
+              <div class="form-group">
+                <label>Intent</label>
+                <select name="intent" required>
+                  <option value="ask_symptom">Ask Symptom</option>
+                  <option value="ask_first_aid">Ask First Aid</option>
+                  <option value="ask_wellness_tip">Wellness Tip</option>
+                  <option value="ask_prevention">Prevention</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Entity (Keyword)</label>
+                <input
+                  type="text"
+                  name="entity"
+                  placeholder="e.g. migraine"
+                  required
+                />
+              </div>
+              <div class="form-group full-width">
+                <label>English Response</label>
+                <textarea name="response_en" rows="2" required></textarea>
+              </div>
+              <div class="form-group full-width">
+                <label>Hindi Response</label>
+                <textarea name="response_hi" rows="2" required></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-plus"></i> Add Entry
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Knowledge Table -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Existing Health Tips</h3>
+          </div>
+          <div class="table-responsive table-scrollable">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th width="5%">ID</th>
+                  <th width="15%">Intent</th>
+                  <th width="15%">Entity</th>
+                  <th width="30%">English</th>
+                  <th width="30%">Hindi</th>
+                  <th width="5%"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for tip in knowledge %}
+                <tr>
+                  <td>{{ tip.id }}</td>
+                  <td><span class="tag">{{ tip.intent }}</span></td>
+                  <td><strong>{{ tip.entity }}</strong></td>
+                  <td>{{ tip.response_en | truncate(60) }}</td>
+                  <td>{{ tip.response_hi | truncate(60) }}</td>
+                  <td>
+                    <form
+                      action="{{ url_for('admin_delete_tip', id=tip.id) }}"
+                      method="POST"
+                      onsubmit="return confirm('Delete?');"
+                    >
+                      <button type="submit" class="icon-btn delete">
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- User Logs Section -->
+        <div class="card" id="users-section">
+          <div class="card-header">
+            <h3>User Logs (Sample)</h3>
+          </div>
+          <div class="table-responsive table-scrollable">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>User ID</th>
+                  <th>Date</th>
+                  <th>Steps</th>
+                  <th>Calories</th>
+                  <th>Mood</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for log in user_logs %}
+                <tr>
+                  <td>{{ log.UserID }}</td>
+                  <td>{{ log.Date }}</td>
+                  <td>{{ log.Steps }}</td>
+                  <td>{{ log.CaloriesBurned }}</td>
+                  <td>{{ log.Mood }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td colspan="5" class="text-center">No logs found.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // Set Date
+      document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+      // Graphs Configuration
+      const chartOptions = {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } } },
+          scales: { x: { grid: { display: false } }, y: { grid: { borderDash: [5, 5] }, beginAtZero: true } }
+      };
+
+      // 1. Feedback Chart (Doughnut)
+      const ctxFeedback = document.getElementById('feedbackChart').getContext('2d');
+      new Chart(ctxFeedback, {
+          type: 'doughnut',
+          data: {
+              labels: {{ chart_feedback_data.labels | tojson }},
+              datasets: [{
+                  data: {{ chart_feedback_data.data | tojson }},
+                  backgroundColor: ['#10B981', '#EF4444'], // Emerald, Red
+                  borderWidth: 0,
+                  hoverOffset: 4
+              }]
+          },
+          options: { ...chartOptions, cutout: '70%', scales: { x: { display: false }, y: { display: false } } }
+      });
+
+      // 2. Activity Chart (Line) - Updated to match the new data from app.py
+      const ctxActivity = document.getElementById('activityChart').getContext('2d');
+      new Chart(ctxActivity, {
+          type: 'line',
+          data: {
+              labels: {{ chart_activity_labels | tojson }}, // Updated variable name
+              datasets: [{
+                  label: 'Queries per Day',
+                  data: {{ chart_activity_data | tojson }}, // Updated variable name
+                  borderColor: '#6366F1', // Indigo line
+                  backgroundColor: 'rgba(99, 102, 241, 0.1)', // Light fill
+                  borderWidth: 2,
+                  fill: true,
+                  tension: 0.4, // Smooth curve
+                  pointRadius: 4,
+                  pointBackgroundColor: '#fff',
+                  pointBorderColor: '#6366F1'
+              }]
+          },
+          options: {
+              ...chartOptions,
+              scales: {
+                  y: {
+                      beginAtZero: true,
+                      grid: { borderDash: [5, 5] },
+                      ticks: { stepSize: 1 } // Force integer steps
+                  },
+                  x: { grid: { display: false } }
+              }
+          }
+      });
+    </script>
+  </body>
+</html>

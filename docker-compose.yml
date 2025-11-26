@@ -1,0 +1,39 @@
+version: '3.0'
+
+services:
+  # 1. The Rasa Server
+  rasa:
+    image: rasa/rasa:3.6.2-full
+    ports:
+      - "5005:5005"
+    volumes:
+      - ./milestone2_rasa:/app
+    command:
+      - run
+      - --enable-api
+      - --cors
+      - "*"
+      - --debug
+    depends_on:
+      - action_server
+
+  # 2. The Action Server
+  action_server:
+    build: ./milestone2_rasa
+    volumes:
+      - ./milestone2_rasa/actions:/app/actions
+      - ./InfyWellBot/project.db:/app/../InfyWellBot/project.db
+    ports:
+      - "5055:5055"
+
+  # 3. The Flask Web App
+  flask_app:
+    build: ./InfyWellBot
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./InfyWellBot/project.db:/app/project.db
+    environment:
+      - FLASK_ENV=production
+    depends_on:
+      - rasa
